@@ -1,39 +1,25 @@
 #!/bin/sh
 
-configure_checker () {
-  if [ -z "${INPUT_AWS_S3_BUCKET:?}" ]; then
-    echo "AWS_S3_BUCKET is not set. Quitting."
-    exit 1
-  fi
+set -e
 
-  if [ -z "${INPUT_AWS_ACCESS_KEY_ID:?}" ]; then
-    echo "AWS_ACCESS_KEY_ID is not set. Quitting."
-    exit 1
-  fi
+# Ensure variables are defined
+: "${AWS_S3_BUCKET:?AWS_S3_BUCKET is not set.}"
+: "${AWS_ACCESS_KEY_ID:?AWS_ACCESS_KEY_ID is not set.}"
+: "${AWS_SECRET_ACCESS_KEY:?AWS_SECRET_ACCESS_KEY is not set.}"
+: "${AWS_COMMAND:?AWS_COMMAND variable not found.}"
 
-  if [ -z "${INPUT_AWS_SECRET_ACCESS_KEY:?}" ]; then
-    echo "AWS_SECRET_ACCESS_KEY is not set. Quitting."
-    exit 1
-  fi
+# Default to us-east-1 if AWS_REGION not set.
+AWS_REGION=${AWS_REGION:-"us-east-1"}
 
-  # Default to us-east-1 if AWS_REGION not set.
-  if [ -z "${INPUT_AWS_REGION:?}" ]; then
-    AWS_REGION="us-east-1"
-  fi
+AWS_FLAGS=${AWS_FLAGS:-""}
 
-  # Override default AWS endpoint if user sets AWS_S3_ENDPOINT.
-  if [ -n "${INPUT_AWS_S3_ENDPOINT:?}" ]; then
-    ENDPOINT_APPEND="--endpoint-url $AWS_S3_ENDPOINT"
-  fi
+# If AWS_S3_ENDPOINT is set, than add append
+if [ -n "${AWS_S3_ENDPOINT:-}" ]; then
+  ENDPOINT_APPEND="--endpoint-url $AWS_S3_ENDPOINT"
+fi
 
-  # Setup s3 command.
-  if [ -z "${INPUT_AWS_COMMAND:?}" ]; then
-    echo "AWS_COMMAND variable not found. Quitting."
-    exit 1
-  fi
-}
-
-setup_profile () {
+# Setup s3 profile
+setup_profile() {
   aws configure --profile aws-s3 <<-EOF > /dev/null 2>&1
 ${AWS_ACCESS_KEY_ID}
 ${AWS_SECRET_ACCESS_KEY}
@@ -42,25 +28,8 @@ text
 EOF
 }
 
-run_aws_s3_cp () {
-  aws s3 cp \
-    s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR} ${INPUT_SOURCE_DIR:-.} \
-    --profile aws-s3 \
-    --no-progress \
-    ${ENDPOINT_APPEND} $1
-}
-
-
-run_aws_s3_sync () {
-  aws s3 sync \
-    ${INPUT_SOURCE_DIR:-.} s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR} \
-    --profile aws-s3 \
-    --no-progress \
-    ${ENDPOINT_APPEND} $1
-}
-
-
-clean_profile () {
+# Clear out credentials after we're done.
+clean_profile() {
   aws configure --profile aws-s3 <<-EOF > /dev/null 2>&1
 null
 null
@@ -69,16 +38,45 @@ text
 EOF
 }
 
+# Run an AWS S3 command using the specified subcommand.
+run_aws_s3 () {
+  local subcommand=$1
+  local source=$2
+  local dest=$3
+
+  # Run the specified subcommand using our dedicated profile and suppress verbose messages.
+  # All other flags are optional via the `AWS_FLAGS` environment variable.
+  sh -c "aws s3 ${subcommand} ${source} ${dest} \
+                --profile aws-s3 \
+                ${ENDPOINT_APPEND} ${AWS_FLAGS}"
+}
+
+run_command () {
+  # Check which command to run and call the corresponding function.
+  case "$AWS_COMMAND" in
+    "cp")
+      if [ -z "${DEST_DIR}" ]; then
+        echo "DEST_DIR is not set. Quitting."
+        exit 1
+      fi
+      run_aws_s3 "cp" "s3://${AWS_S3_BUCKET}/${DEST_DIR}" "${SOURCE_DIR:-.}"
+      ;;
+    "sync")
+      run_aws_s3 "sync" "${SOURCE_DIR:-.}" "s3://${AWS_S3_BUCKET}/${DEST_DIR}"
+      ;;
+    "ls")
+      run_aws_s3 "ls" "s3://${AWS_S3_BUCKET}/${SOURCE_DIR:-}"
+      ;;
+    *)
+      echo "Invalid AWS_COMMAND: ${AWS_COMMAND}. Quitting."
+      exit 1
+      ;;
+  esac
+}
+
 main () {
-  configure_checker
   setup_profile
-
-  if [ "$INPUT_AWS_COMMAND" = "cp" ]; then
-    run_aws_s3_cp "$INPUT_FLAGS"
-  elif [ "$INPUT_AWS_COMMAND" = "sync" ]; then
-    run_aws_s3_sync "$INPUT_FLAGS"
-  fi
-
+  run_command
   clean_profile
 }
 
