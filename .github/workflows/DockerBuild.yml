@@ -8,12 +8,15 @@ on:
     branches:
       - main
     paths:
-      - aws-cli/
-      - aws-s3/
+      - aws-cli/Dockerfile
+      - aws-cli/requirements.txt
+      - aws-s3/Dockerfile
+      - aws-s3/entrypoint.sh
   pull_request:
     paths:
-      - aws-cli/
-      - aws-s3/
+      - aws-cli/Dockerfile
+      - aws-cli/requirements.txt
+      - aws-s3/Dockerfile
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -31,7 +34,9 @@ jobs:
       docker_label_title: "Docker AWS CLI"
       docker_label_description: "AWS CLI in Docker"
       version_detecter: true
-      version_detecter_var: "AWSCLI_VERSION="
+      version_detecter_file: "aws-cli/requirements.txt"
+      version_detecter_var: "AWSCLI_VERSION=="
+      version_detecter_cut: "3"
 
   docker_aws_s3:
     needs: [ "docker_aws_cli" ]
