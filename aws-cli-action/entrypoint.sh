@@ -55,7 +55,7 @@ run_command () {
   # Check which command to run and call the corresponding function.
   case "$INPUT_AWS_COMMAND" in
     "cp")
-      if [ -z "${DEST_DIR}" ]; then
+      if [ -z "${INPUT_DEST_DIR}" ]; then
         echo "DEST_DIR is not set. Quitting."
         exit 1
       fi
