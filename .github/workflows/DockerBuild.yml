@@ -1,0 +1,46 @@
+name: Docker
+
+on:
+  workflow_dispatch: {}
+  # schedule:
+  #   - cron: "0 16 * * 1"
+  push:
+    branches:
+      - main
+    paths:
+      - aws-cli/
+      - aws-s3/
+  pull_request:
+    paths:
+      - aws-cli/
+      - aws-s3/
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker_aws_cli:
+    name: docker build (aws-cli)
+    uses: Docker-Collection/reusable-workflows/.github/workflows/docker-build.yml@main
+    with:
+      docker_name: "ghcr.io/docker-collection/aws-cli"
+      context: "aws-cli/"
+      dockerfile: "aws-cli/Dockerfile"
+      docker_label_author: "Efina"
+      docker_label_title: "Docker AWS CLI"
+      docker_label_description: "AWS CLI in Docker"
+      version_detecter: true
+      version_detecter_var: "AWSCLI_VERSION="
+
+  docker_aws_s3:
+    needs: [ "docker_aws_cli" ]
+    name: docker build (aws-s3)
+    uses: Docker-Collection/reusable-workflows/.github/workflows/docker-build.yml@main
+    with:
+      docker_name: "ghcr.io/docker-collection/aws-s3"
+      context: "aws-s3/"
+      dockerfile: "aws-s3/Dockerfile"
+      docker_label_author: "Efina"
+      docker_label_title: "Docker AWS S3"
+      docker_label_description: "AWS S3 in Docker"
