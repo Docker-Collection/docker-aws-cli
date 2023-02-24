@@ -15,5 +15,6 @@
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.*.?)(?: (lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[a-z-0-9]+?))?\\s(?:ENV|ARG) .+?_VERSION=\"?(?<currentValue>.+?)\"?\\s"
       ]
     }
-  ]
+  ],
+  "ignorePaths": ["**/aws-s3/**"]
 }
