@@ -35,7 +35,7 @@ jobs:
       docker_label_description: "AWS CLI in Docker"
       version_detecter: true
       version_detecter_file: "aws-cli/requirements.txt"
-      version_detecter_var: "AWSCLI_VERSION=="
+      version_detecter_var: "awscli=="
       version_detecter_cut: "3"
 
   docker_aws_s3:
