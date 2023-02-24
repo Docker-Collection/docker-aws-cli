@@ -20,7 +20,7 @@ docker run \
   -e AWS_S3_BUCKET="<S3_BUCKET_NAME>" \
   -e AWS_REGION="us-east-1" \
   -e AWS_COMMAND="sync" \
-  aws-s3:latest
+  ghcr.io/docker-collection/aws-s3:latest
 ```
 
 ### Download from s3
@@ -28,10 +28,6 @@ docker run \
 Input all ``<>`` value.
 
 Value ``SOURCE_DIR`` and ``DEST_DIR`` will be reverse.
-
-``SOURCE_DIR`` will be where the file is stored.
-
-``DEST_DIR`` will be where the file (folder) is to download.
 
 ```bash
 docker run \
@@ -45,5 +41,30 @@ docker run \
   -e AWS_S3_BUCKET="<S3_BUCKET_NAME>" \
   -e AWS_REGION="us-east-1" \
   -e AWS_COMMAND="cp" \
-  aws-s3:latest
+  ghcr.io/docker-collection/aws-s3:latest
 ```
+
+### List s3
+
+Input all ``<>`` value.
+
+```bash
+docker run \
+  --rm -it \
+  -e AWS_ACCESS_KEY_ID="<ACCESS_KEY_ID>" \
+  -e AWS_SECRET_ACCESS_KEY="<SECRET_ACCESS_KEY>" \
+  -e AWS_S3_ENDPOINT="<OPTION_S3_ENDPOINT>" \
+  -e SOURCE_DIR="<OPTION>" \
+  -e AWS_S3_BUCKET="<S3_BUCKET_NAME>" \
+  -e AWS_REGION="us-east-1" \
+  -e AWS_COMMAND="ls" \
+  ghcr.io/docker-collection/aws-s3:latest
+```
+
+## Reference
+
+- [s3-sync-action](https://github.com/jakejarvis/s3-sync-action)
+- [s3-cp-action](https://github.com/prewk/s3-cp-action)
+- [s3-cp-action](https://github.com/luke-m/s3-cp-action)
+- [aws-s3-github-action](https://github.com/keithweaver/aws-s3-github-action)
+- [action-s3-cp](https://github.com/qoqa/action-s3-cp)

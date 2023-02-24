@@ -1,6 +1,6 @@
 # Docker AWS S3
 
-The script comes from other repo, and I remake it to make it work with ``cp`` ``sync`` command.
+The script comes from other repo, and I remake it to make it work with ``cp`` ``sync`` ``ls`` command.
 
 ## Reference
 
