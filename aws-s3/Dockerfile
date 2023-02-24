@@ -1,4 +1,4 @@
-FROM ghcr.io/docker-collection/aws-cli@sha256:0dd5dbef3277ae274e006245b6e1dbebb88a315db19ac9786ee5d9540aa2e873
+FROM ghcr.io/docker-collection/aws-cli@sha256:2cf17fa93970b9f8b7aab3c7a333bcd5c37fdb303d428722a30808d972310c6e
 
 COPY entrypoint.sh entrypoint.sh
 
