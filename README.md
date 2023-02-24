@@ -1,6 +1,6 @@
-# Docker AWS CLI
+# Docker AWS
 
-Simple aws cli.
+Simple aws cli & s3.
 
 ## Using Docker Command
 
