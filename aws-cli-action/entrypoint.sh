@@ -39,10 +39,10 @@ EOF
 }
 
 # Run an AWS S3 command using the specified subcommand.
-run_aws_s3 () {
-  local subcommand=$1
-  local source=$2
-  local dest=$3
+aws_s3 () {
+  subcommand=$1
+  source=$2
+  dest=$3
 
   # Run the specified subcommand using our dedicated profile and suppress verbose messages.
   # All other flags are optional via the `AWS_FLAGS` environment variable.
@@ -54,18 +54,25 @@ run_aws_s3 () {
 run_command () {
   # Check which command to run and call the corresponding function.
   case "$INPUT_AWS_COMMAND" in
+    "sync")
+      aws_s3 "sync" "${INPUT_SOURCE_DIR:-.}" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR}"
+      ;;
     "cp")
       if [ -z "${INPUT_DEST_DIR}" ]; then
         echo "DEST_DIR is not set. Quitting."
         exit 1
       fi
-      run_aws_s3 "cp" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR}" "${INPUT_SOURCE_DIR:-.}"
-      ;;
-    "sync")
-      run_aws_s3 "sync" "${INPUT_SOURCE_DIR:-.}" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR}"
+      aws_s3 "cp" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR}" "${INPUT_SOURCE_DIR:-.}"
       ;;
     "ls")
-      run_aws_s3 "ls" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_SOURCE_DIR:-}"
+      aws_s3 "ls" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_SOURCE_DIR:-}"
+      ;;
+    "rm")
+      if [ -z "${INPUT_DEST_DIR}" ]; then
+        echo "DEST_DIR is not set. Quitting."
+        exit 1
+      fi
+      aws_s3 "rm" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR}"
       ;;
     *)
       echo "Invalid AWS_COMMAND: ${INPUT_AWS_COMMAND}. Quitting."
