@@ -55,7 +55,7 @@ run_command () {
   # Check which command to run and call the corresponding function.
   case "$INPUT_AWS_COMMAND" in
     "sync")
-      aws_s3 "sync" "${INPUT_SOURCE_DIR}" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR}"
+      aws_s3 "sync" "${INPUT_SOURCE_DIR:-.}" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR}"
       ;;
     "cp")
       if [ -z "${INPUT_DEST_DIR}" ]; then

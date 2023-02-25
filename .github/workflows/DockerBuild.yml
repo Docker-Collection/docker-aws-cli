@@ -8,18 +8,14 @@ on:
     branches:
       - main
     paths:
-      - aws-cli/Dockerfile
-      - aws-cli/requirements.txt
-      - aws-cli-action/Dockerfile
-      - aws-cli-action/requirements.txt
+      - aws-cli/**
+      - aws-cli-action/**
       - aws-s3/Dockerfile
       - aws-s3/entrypoint.sh
   pull_request:
     paths:
-      - aws-cli/Dockerfile
-      - aws-cli/requirements.txt
-      - aws-cli-action/Dockerfile
-      - aws-cli-action/requirements.txt
+      - aws-cli/**
+      - aws-cli-action/**
       - aws-s3/Dockerfile
 
 concurrency: 
