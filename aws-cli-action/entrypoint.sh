@@ -11,7 +11,11 @@ set -e
 # Default to us-east-1 if AWS_REGION not set.
 AWS_REGION=${INPUT_AWS_REGION:-"us-east-1"}
 
+# AWS Flags setting
 AWS_FLAGS=${INPUT_AWS_FLAGS:-""}
+
+# Sync reverse for download folder content, default is false
+SYNC_REVERSE=${INPUT_SYNC_REVERSE:-false}
 
 # If AWS_S3_ENDPOINT is set, than add append
 if [ -n "${INPUT_AWS_S3_ENDPOINT:-}" ]; then
@@ -55,7 +59,14 @@ run_command () {
   # Check which command to run and call the corresponding function.
   case "$INPUT_AWS_COMMAND" in
     "sync")
-      aws_s3 "sync" "${INPUT_SOURCE_DIR:-.}" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR}"
+      if [ "${SYNC_REVERSE}" = false ]; then
+        aws_s3 "sync" "${INPUT_SOURCE_DIR:-.}" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR}"
+      elif [ "${SYNC_REVERSE}" = true ]; then
+        aws_s3 "sync" "s3://${INPUT_AWS_S3_BUCKET}/${INPUT_DEST_DIR}" "${INPUT_SOURCE_DIR:-.}"
+      else
+        echo "Unknow ${SYNC_REVERSE}. Quitting."
+        exit 1
+      fi
       ;;
     "cp")
       if [ -z "${INPUT_DEST_DIR}" ]; then
