@@ -1,4 +1,4 @@
-FROM python:3.12.0-alpine@sha256:3d2969ec27f0b38fc53ba7e4b6e01459a6f397f27649d82dc8e82631267bca0d as Builder
+FROM python:3.12.0-alpine@sha256:1d688a37293956d3e0658dfb54938082933cca848ec9105c1680b39d91b912a8 as Builder
 
 COPY requirements.txt .
 COPY entrypoint.sh .
